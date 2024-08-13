@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canvas Drawing</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+  </head>
+  <body>
+    <canvas></canvas>
+    <div class="control-bar">
+      <button id="machine-button">Add Machine</button>
+      <button id="queue-button">Add Queue</button>
+      <button id="line-button">Add Line</button>
+      <button id="simulation-button">Start Simulation</button>
+      <input type="color" id="color-picker" />
+      <script src="canvas.js"></script>
+      <script src="updateHandler.js"></script>
+      <script src="wsClient.js"></script>
+    </div>
+  </body>
+</html>
