@@ -28,18 +28,30 @@ public class PCQueueWrapper implements Runnable{
             if(IsLastQueue){
                 queue.dequeue();
             }
-            ArrayList<PCMachine> readyMachines = new ArrayList<>();
-            for(PCMachine machine : machineList){
-                if(machine.state != State.RUNNING)
+            //ArrayList<PCMachine> readyMachines = new ArrayList<>();
+            /*for(PCMachine machine : machineList){
+                System.out.println("--> machine" + machine.id);
+                if(machine.state == State.IDLE) {
+                    System.out.println("$$ machine" + machine.id);
                     readyMachines.add(machine);
-            }
-            int len = min(machineList.size(), queue.size());
+                }
+            }*/
+
+            /*int len = min(readyMachines.size(), queue.size());
+            System.out.println("Queue" + queue.getId() + "readyMachines" + len);
             for(int i = 0; i < len; i++) {
                 Product product = queue.dequeue();
-                try {
-                    readyMachines.get(i).serve(product);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                System.out.println("Machine " + readyMachines.get(i).id + "chosen to serve");
+                //readyMachines.get(i).serve(product);
+                readyMachines.get(i).setProductToServe(product);
+            }*/
+
+            for(PCMachine machine : machineList){
+                if(machine.state == State.IDLE && queue.size() > 0){
+                    Product product = queue.dequeue();
+                    System.out.println("Product " + product.getId() + "served by machine " + machine.id);
+                    boolean returnBool = machine.setProductToServe(product);
+                    System.out.println(returnBool);
                 }
             }
         }

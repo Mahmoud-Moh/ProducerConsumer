@@ -1,12 +1,7 @@
 package com.example.prodcons.ws;
 
-import com.example.prodcons.models.Greeting;
-import com.example.prodcons.models.HelloMessage;
-import com.example.prodcons.models.synchronization_elements.PCQueueWrapper;
 import com.example.prodcons.models.synchronization_elements.Product;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.support.MessageBuilder;
 
 public class Updater {
     private SimpMessagingTemplate messagingTemplate;

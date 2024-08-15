@@ -11,9 +11,10 @@ public class PCMachine implements Runnable{
     String color;
     State state;
     Lock lock = new ReentrantLock();
+    Lock setProductLock = new ReentrantLock();
     PCQueueWrapper outQueueW;
     private Updater updater;
-
+    private Product productToServe;
 
     public PCMachine(String id) {
         this.color = "black";
@@ -33,8 +34,7 @@ public class PCMachine implements Runnable{
             System.out.println("Machine " + id + "Started Processing Product" + p.getId());
             updateState(p.getColor(), State.RUNNING);
             updater.update("machine", id, "start", p);
-            Thread.sleep(1000);
-            updateState(State.READY);
+            Thread.sleep(3000);
             finish(p);
             System.out.println("Machine " + id + "Finished Processing Product" + p.getId());
             updater.update("machine", id, "finish", p);
@@ -45,10 +45,10 @@ public class PCMachine implements Runnable{
 
     public void updateState(String color, State state) {
         this.color = color;
-        this.state = State.RUNNING;
+        this.state = state;
     }
 
-    public void updateState(State state){
+    public void updateState(){
         this.state = State.RUNNING;
     }
 
@@ -61,7 +61,17 @@ public class PCMachine implements Runnable{
     @Override
     public void run(){
         while(true){
-            //Don't know
+            if(state == State.READY){
+                if(productToServe == null){
+                    System.out.println("What the hell why is it null and ready");
+                }
+                System.out.println(productToServe.getId());
+                try {
+                    serve(productToServe);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -71,5 +81,20 @@ public class PCMachine implements Runnable{
 
     public void setUpdater(Updater updater) {
         this.updater = updater;
+    }
+
+    public boolean setProductToServe(Product p) {
+        if(state != State.IDLE)
+            return false;
+        setProductLock.lock();
+        this.productToServe = p;
+        state = State.READY;
+        if(this.productToServe == null){
+            System.out.println("#### I SAID SET IT NOT NULL###");
+        }else{
+            System.out.println("#### " + productToServe.getId() + "###");
+        }
+        setProductLock.unlock();
+        return true;
     }
 }

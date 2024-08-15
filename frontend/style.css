@@ -6,9 +6,52 @@ canvas {
   width: 100%;
   height: 700px;
   border: 3px solid black;
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .control-bar {
   border: none;
   height: 500px;
+}
+
+button {
+  font-family: "Press Start 2P", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #fefbd8;
+  height: 60px;
+  color: black;
+  margin: 10px;
+  border: 2px solid black;
+  box-shadow: 2px 2px 2px #000000;
+}
+button:hover {
+  box-shadow: 2px 2px 6px #000000;
+  cursor: pointer;
+}
+
+button:active {
+  box-shadow: 2px 2px 10px #000000;
+  cursor: pointer;
+  background-color: #ffef96;
+  transform: translateY(2px) translateX(3px);
+}
+
+#simulation-button {
+  background-color: #618685;
+  width: 80px;
+  margin-left: auto;
+  margin-right: 50%;
+}
+
+div {
+  background-color: #36486b;
+  margin: 0;
+  display: flex;
+}
+
+.control-bar {
+  color: brown;
 }

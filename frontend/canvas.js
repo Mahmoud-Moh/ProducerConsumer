@@ -4,7 +4,7 @@ const machineButton = document.getElementById("machine-button");
 const queueButton = document.getElementById("queue-button");
 const lineButton = document.getElementById("line-button");
 const simulationButton = document.getElementById("simulation-button");
-const colorPicker = document.getElementById("color-picker");
+//const colorPicker = document.getElementById("color-picker");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -36,24 +36,30 @@ let m2q = {},
   q2m = {};
 
 const inputter = {
+  color: "#f18973",
   x: innerWidth - 200,
   y: innerHeight / 2,
+  size: 50,
 };
 const outputter = {
+  color: "#f18973",
   x: 200,
   y: innerHeight / 2,
+  size: 50,
 };
 
+ctx.font = '37px "VT323", monospace, normal';
 //-------------------------------------------------------
 function animate() {
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, innerWidth, innerHeight);
+  drawLines();
   drawInput();
   drawOutput();
-  drawLines();
-  //if (isSimulation) {
-  //drawProducts();
-  //}
+
+  if (isSimulation) {
+    drawProducts();
+  }
   drawAnimations();
   drawMachines();
   drawQueues();
@@ -69,6 +75,15 @@ function drawMachines() {
     ctx.fillRect(square.x, square.y, square.size, square.size);
     ctx.strokeStyle = "black";
     ctx.strokeRect(square.x, square.y, square.size, square.size);
+    if (square.color != machineColor) {
+      ctx.strokeStyle = "black";
+      ctx.strokeRect(
+        square.x - 5,
+        square.y - 5,
+        square.size + 10,
+        square.size + 10
+      );
+    }
   }
 }
 
@@ -78,6 +93,14 @@ function drawQueues() {
     ctx.fillRect(square.x, square.y, square.size * 2, square.size);
     ctx.strokeStyle = "black";
     ctx.strokeRect(square.x, square.y, square.size * 2, square.size);
+    ctx.fillStyle = "#000000";
+    //ctx.font = "18px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      "Q" + square.id + "," + square.content,
+      square.x + square.size,
+      square.y + square.size / 2
+    );
   }
 }
 
@@ -94,17 +117,45 @@ function drawLines() {
   ctx.lineWidth = 2;
   ctx.strokeStyle = "black";
   ctx.setLineDash([]);
+  const headlen = 10; // length of head in pixels
+
   for (const line of lines) {
     ctx.beginPath();
     ctx.moveTo(line.xs, line.ys);
     ctx.lineTo(line.xe, line.ye);
+    ctx.stroke();
+    // Calculate the midpoint of the line
+    const xm = (line.xs + line.xe) / 2;
+    const ym = (line.ys + line.ye) / 2;
+
+    // Calculate the angle of the line
+    const angle = Math.atan2(line.ye - line.ys, line.xe - line.xs);
+
+    // Draw the line from the start to end points
+    ctx.beginPath();
+    ctx.moveTo(line.xs, line.ys);
+    ctx.lineTo(line.xe, line.ye);
+    ctx.stroke();
+
+    // Draw the arrowhead at the midpoint
+    ctx.beginPath();
+    ctx.moveTo(xm, ym);
+    ctx.lineTo(
+      xm - headlen * Math.cos(angle - Math.PI / 6),
+      ym - headlen * Math.sin(angle - Math.PI / 6)
+    );
+    ctx.moveTo(xm, ym);
+    ctx.lineTo(
+      xm - headlen * Math.cos(angle + Math.PI / 6),
+      ym - headlen * Math.sin(angle + Math.PI / 6)
+    );
     ctx.stroke();
   }
 }
 
 function drawTexts() {
   ctx.fillStyle = "#000000";
-  ctx.font = "18px Arial";
+  //ctx.font = "18px Arial";
   ctx.textAlign = "center";
   for (const text of texts) {
     ctx.fillText(text.val, text.x, text.y);
@@ -123,9 +174,10 @@ function drawProducts() {
         0,
         2 * Math.PI
       );
+      ctx.fillStyle = product.color;
       ctx.fill();
-      product.x = product.x + product.xinc;
-      product.y = product.y + product.yinc;
+      product.x = product.x + product.xinc * 10;
+      product.y = product.y + product.yinc * 10;
       product.step++;
       if (Math.abs(product.step - product.steps) < product_col_eps)
         product.stop = true;
@@ -167,13 +219,14 @@ function drawQueue(x, y) {
     x: x - size,
     y: y - size / 2,
     size,
+    content: 0,
     color: queueColor,
   });
-  texts.push({
+  /*texts.push({
     val: "Q" + queueId.toString(),
     x: x,
     y: y,
-  });
+  });*/
   queueId++;
   isDrawingQueue = false;
 }
@@ -185,6 +238,17 @@ function drawMachineSelectionBox(square) {
     y: square.y - padding,
     w: square.size + padding * 2,
     h: square.size + padding * 2,
+  });
+}
+
+function drawCircleSelectionBox(square) {
+  let padding = 15;
+
+  selections.push({
+    x: square.x - square.size - padding,
+    y: square.y - square.size - padding,
+    w: square.size * 2 + padding * 2,
+    h: square.size * 2 + padding * 2,
   });
 }
 
@@ -226,6 +290,27 @@ function drawLine() {
 }
 
 function findElement(x, y) {
+  if (
+    x >= inputter.x - inputter.size &&
+    x <= inputter.x + inputter.size &&
+    y >= inputter.y - inputter.size &&
+    y <= inputter.y + inputter.size
+  ) {
+    return {
+      selectedElement: inputter,
+      type: "inputter",
+    };
+  } else if (
+    x >= outputter.x - outputter.size &&
+    x <= outputter.x + outputter.size &&
+    y >= outputter.y - outputter.size &&
+    y <= outputter.y + outputter.size
+  ) {
+    return {
+      selectedElement: outputter,
+      type: "outputter",
+    };
+  }
   selectedElement = machines.find(
     (square) =>
       x >= square.x &&
@@ -247,27 +332,28 @@ function findElement(x, y) {
   }
   return {
     selectedElement: selectedElement,
-    isQueue: isQueue,
+    type: isQueue ? "queue" : "machine",
   };
 }
 
-function drawProduct(line) {
-  let xs = line.xs;
+function drawProduct(xs, ys, xe, ye, color) {
+  /*let xs = line.xs;
   let ys = line.ys;
   let xe = line.xe;
-  let ye = line.ye;
+  let ye = line.ye;*/
   let dx = xe - xs;
   let dy = ye - ys;
-  let steps = dx > dy ? Math.abs(dx) : Math.abs(dy);
+  let steps = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
   let stepsDx = dx > dy;
   xinc = dx / steps;
   yinc = dy / steps;
 
   products.push({
+    color: color,
     id: productId,
     x: Math.floor(xs),
     y: Math.floor(ys),
-    steps: steps,
+    steps: steps / 10,
     xinc: xinc,
     yinc: yinc,
     stepsDx: stepsDx,
@@ -279,7 +365,7 @@ function drawProduct(line) {
 }
 
 function formProducts() {
-  console.log("form points");
+  //console.log("form points");
   for (let line of lines) {
     drawProduct(line);
   }
@@ -294,20 +380,32 @@ function createSimulation() {
     //There's an assumption that q->m or m->q (no q->q or m->m)
     let foundElement1 = findElement(xs, ys);
     let selectedElement1 = foundElement1.selectedElement;
-    let isQueue1 = foundElement1.isQueue;
+    let type1 = foundElement1.type;
     let foundElement2 = findElement(xe, ye);
     let selectedElement2 = foundElement2.selectedElement;
-    let isQueue2 = foundElement2.isQueue;
-    let id = selectedElement1.id;
-    if (isQueue1) {
-      q2m[id] = selectedElement2.id;
-    } else {
-      m2q[id] = selectedElement2.id;
+    let type2 = foundElement2.type;
+    if (type1 === "queue" && type2 === "machine") {
+      if (selectedElement1.id.toString() in q2m) {
+        q2m[selectedElement1.id].push(selectedElement2.id);
+      } else {
+        q2m[selectedElement1.id] = [];
+        q2m[selectedElement1.id].push(selectedElement2.id);
+      }
+    } else if (type1 === "machine" && type2 === "queue") {
+      if (selectedElement1.id.toString() in m2q) {
+        m2q[selectedElement1.id].push(selectedElement2.id);
+      } else {
+        m2q[selectedElement1.id] = [];
+        m2q[selectedElement1.id].push(selectedElement2.id);
+      }
     }
   }
 }
 
-function addAnimation(type1, id1, type2, id2) {
+function addAnimation(type1, id1, type2, id2, color) {
+  console.log("type1: " + type1 + " id1: " + id1);
+  console.log("type2: " + type2 + " id2: " + id2);
+  //console.log("Adding the Animation.....");
   let xs = 0,
     ys = 0,
     xe = 0,
@@ -316,11 +414,13 @@ function addAnimation(type1, id1, type2, id2) {
     xs = inputter.x;
     ys = inputter.y;
   } else if (type1 === "queue") {
-    xs = queues[id1].x;
-    ys = queues[id1].y;
+    //Mayneed to be changed
+    xs = queues[id1].x + queues[id1].size;
+    ys = queues[id1].y + queues[id1].size / 2;
   } else if (type1 === "machine") {
-    xs = machines[id1].x;
-    ys = machines[id1].y;
+    //Mayneed to be changed
+    xs = machines[id1].x + machines[id1].size / 2;
+    ys = machines[id1].y + machines[id1].size / 2;
   }
 
   if (type2 === "outputter") {
@@ -328,29 +428,36 @@ function addAnimation(type1, id1, type2, id2) {
     ye = outputter.y;
   }
   if (type2 === "queue") {
-    xe = queues[id2].x;
-    ye = queues[id2].y;
+    //Mayneed to be changed
+    xe = queues[id2].x + queues[id2].size;
+    ye = queues[id2].y + queues[id2].size / 2;
   } else if (type2 === "machine") {
-    xe = machines[id2].x;
-    ye = machines[id2].y;
+    //Mayneed to be changed
+    xe = machines[id2].x + machines[id2].size / 2;
+    ye = machines[id2].y + machines[id2].size / 2;
   }
-  animations.push({
+  console.log("animation push##");
+  drawProduct(xs, ys, xe, ye, color);
+  /*animations.push({
     val: "start",
-    x: xs,
-    y: ys,
-  });
-  animations.push({
+    xs: xs,
+    ys: ys,
+    xe: xe,
+    ye: ye,
+  });*/
+  console.log("animation push@@");
+  /*animations.push({
     val: "end",
     x: xe,
     y: ye,
-  });
+  });*/
 }
 //===================================================================
 // Add event listener to draw squares
 canvas.addEventListener("click", (event) => {
   var x = event.clientX;
   var y = event.clientY;
-  console.log(x + " " + y);
+  //console.log(x + " " + y);
   y = (y * innerHeight) / canvas_height;
 
   if (isDrawingMachine) {
@@ -361,12 +468,14 @@ canvas.addEventListener("click", (event) => {
     // Check if click is inside any square
     let foundElement = findElement(x, y);
     let selectedElement = foundElement.selectedElement;
-    let isQueue = foundElement.isQueue;
+    let type = foundElement.type;
     if (selectedElement) {
-      if (isQueue) drawQueueSelectionBox(selectedElement);
-      else drawMachineSelectionBox(selectedElement);
-      if (isQueue) selectedElement.color = queueColor;
-      else selectedElement.color = machineColor; // Change color of selected square
+      //console.log("selected element true");
+      if (type === "queue") drawQueueSelectionBox(selectedElement);
+      else if (type === "machine") drawMachineSelectionBox(selectedElement);
+      else drawCircleSelectionBox(selectedElement);
+      if (type === "queue") selectedElement.color = queueColor;
+      else if (type === "machine") selectedElement.color = machineColor;
     } else {
       selections = [];
     }
@@ -388,12 +497,12 @@ lineButton.addEventListener("click", () => {
 });
 
 // Update current color from color picker
-colorPicker.addEventListener("input", (event) => {
+/*colorPicker.addEventListener("input", (event) => {
   currentColor = event.target.value;
   machineColor = currentColor;
   queueColor = currentColor;
-  console.log(currentColor);
-});
+  //console.log(currentColor);
+});*/
 
 //=======================================================
 //=============Draw Input and Output=====================
@@ -401,29 +510,35 @@ colorPicker.addEventListener("input", (event) => {
 //Input
 
 function drawInput() {
-  ctx.fillStyle = "#A569BD";
+  ctx.fillStyle = inputter.color;
   ctx.beginPath();
-  ctx.arc(inputter.x, inputter.y, 50, 0, 2 * Math.PI);
+  ctx.arc(inputter.x, inputter.y, inputter.size, 0, 2 * Math.PI);
   ctx.fill();
   ctx.setLineDash([]);
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(inputter.x, inputter.y, 50, 0, 2 * Math.PI);
+  ctx.arc(inputter.x, inputter.y, inputter.size, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fillStyle = "black";
   ctx.fillText("Input", inputter.x, inputter.y);
 }
 
 function drawOutput() {
-  ctx.fillStyle = " #D35400";
+  ctx.fillStyle = outputter.color;
   ctx.beginPath();
-  ctx.arc(outputter.x, outputter.y, 50, 0, 2 * Math.PI);
+  ctx.arc(outputter.x, outputter.y, outputter.size, 0, 2 * Math.PI);
   ctx.fill();
   ctx.setLineDash([]);
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(outputter.x, outputter.y, 50, 0, 2 * Math.PI);
+  ctx.arc(outputter.x, outputter.y, outputter.size, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fillStyle = "black";
   ctx.fillText("Output", outputter.x, outputter.y);
+}
+
+const curr_update = {},
+  prev_update = {};
+function handleUpdateBuffer(update) {
+  const curr_update = update;
 }

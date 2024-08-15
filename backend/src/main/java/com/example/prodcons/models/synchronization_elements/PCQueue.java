@@ -79,4 +79,51 @@ public class PCQueue {
         this.updater = updater;
     }
 
+    public ArrayList<Product> getQ() {
+        return q;
+    }
+
+    public Lock getLock() {
+        return lock;
+    }
+
+    public Condition getNot_empty() {
+        return not_empty;
+    }
+
+    public Condition getNot_full() {
+        return not_full;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setQ(ArrayList<Product> q) {
+        this.q = q;
+    }
+
+    public void setLock(Lock lock) {
+        this.lock = lock;
+    }
+
+    public void setNot_empty(Condition not_empty) {
+        this.not_empty = not_empty;
+    }
+
+    public void setNot_full(Condition not_full) {
+        this.not_full = not_full;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

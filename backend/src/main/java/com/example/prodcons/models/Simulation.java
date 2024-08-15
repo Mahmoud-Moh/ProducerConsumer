@@ -31,19 +31,21 @@ public class Simulation {
         System.out.println("-----########------");*/
 
         for(int i=0; i<diagram.getNo_machines(); i++){
-            machines.add(new PCMachine(String.valueOf(i+1)));
+            machines.add(new PCMachine(String.valueOf(i)));
             machines.get(i).setUpdater(updater);
         }
         for(int i=0; i<diagram.getNo_queues(); i++){
-            queueWrappers.add(new PCQueueWrapper(new PCQueue(capacity, String.valueOf(i+1))));
+            queueWrappers.add(new PCQueueWrapper(new PCQueue(capacity, String.valueOf(i))));
             queueWrappers.get(i).queue.setUpdater(updater);
         }
         for(int i=0; i<diagram.getM2q().size(); i++){
-            machines.get(i).setOutQueueW(queueWrappers.get(diagram.getM2q().get(i)));
+            machines.get(i).setOutQueueW(queueWrappers.get(diagram.getM2q().get(String.valueOf(i)).get(0)));
         }
         for(int i=0; i<diagram.getQ2m().size(); i++){
-            queueWrappers.get(i).addMachine(machines.get(diagram.getQ2m().get(i)));
+            for(int j=0; j<diagram.getQ2m().get(String.valueOf(i)).size(); j++)
+                queueWrappers.get(i).addMachine(machines.get(diagram.getQ2m().get(String.valueOf(i)).get(j)));
         }
+        queueWrappers.get(queueWrappers.size()-1).setLastQueue(true);
     }
 
     public Simulation(Diagram diagram, SimpMessagingTemplate template) {

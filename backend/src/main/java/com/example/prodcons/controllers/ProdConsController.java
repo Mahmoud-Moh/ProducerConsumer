@@ -20,6 +20,7 @@ public class ProdConsController {
     @MessageMapping("/simulation")
     @SendTo("/topic/updates")
     public String greeting(String diagram) throws InterruptedException, JsonProcessingException {
+        System.out.println(diagram);
         ObjectMapper objectMapper = new ObjectMapper();
         Diagram diagram1 = objectMapper.readValue(diagram, Diagram.class);
 

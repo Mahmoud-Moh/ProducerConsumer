@@ -6,7 +6,11 @@ stompClient.onConnect = (frame) => {
   console.log("Connected: " + frame);
   stompClient.subscribe("/topic/updates", (update) => {
     console.log("Update received: ", update.body);
-    handleUpdate(JSON.parse(update));
+    try {
+      handleUpdate(JSON.parse(update.body));
+    } catch (error) {
+      console.log("error parsing " + error);
+    }
   });
   sendSimulation();
 };
@@ -35,8 +39,8 @@ function sendSimulation() {
     body: JSON.stringify({
       no_machines: machines.length,
       no_queues: queues.length,
-      m2q: Object.values(m2q),
-      q2m: Object.values(q2m),
+      m2q: m2q,
+      q2m: q2m,
     }),
   });
 }

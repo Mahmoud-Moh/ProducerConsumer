@@ -9,25 +9,14 @@ public class Inputter implements Runnable{
             "#FF0000", // Red
             "#00FF00", // Lime
             "#0000FF", // Blue
-            "#FFFF00", // Yellow
             "#FF00FF", // Fuchsia
-            "#00FFFF", // Aqua
             "#800000", // Maroon
             "#808000", // Olive
             "#008000", // Green
             "#800080", // Purple
             "#008080", // Teal
-            "#C0C0C0", // Silver
-            "#808080", // Gray
-            "#F0F8FF", // AliceBlue
-            "#FAEBD7", // AntiqueWhite
-            "#00FFFF", // Aqua
-            "#7FFF00", // Chartreuse
-            "#D3D3D3", // LightGray
-            "#DCDCDC", // Gainsboro
-            "#F5F5F5"  // WhiteSmoke
     };
-    int colorCounter = 0;
+    int colorCounter = -1;
     private SimpMessagingTemplate messagingTemplate;
 
     public Inputter() {
