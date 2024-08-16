@@ -62,7 +62,7 @@ Welcome to the **Producer-Consumer Simulation App**! This application leverages 
 
 ## 🛠️ Contributing
 
-Contributions are welcome! If you have suggestions, improvements, or issues, please submit a pull request or open an issue. Follow the [contributing guidelines](CONTRIBUTING.md) for details.
+Contributions are welcome! If you have suggestions, improvements, or issues, please submit a pull request or open an issue.
 
 ## 📞 Contact
 
