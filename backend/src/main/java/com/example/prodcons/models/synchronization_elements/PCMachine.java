@@ -34,7 +34,7 @@ public class PCMachine implements Runnable{
             System.out.println("Machine " + id + "Started Processing Product" + p.getId());
             updateState(p.getColor(), State.RUNNING);
             updater.update("machine", id, "start", p);
-            Thread.sleep(3000);
+            Thread.sleep(4000);
             finish(p);
             System.out.println("Machine " + id + "Finished Processing Product" + p.getId());
             updater.update("machine", id, "finish", p);

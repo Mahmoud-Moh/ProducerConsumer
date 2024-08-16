@@ -16,6 +16,7 @@ public class PCQueue {
     private int capacity;
     private String id;
     private Updater updater;
+    private boolean isLastQueue = false;
 
     public PCQueue(int capacity, String id) {
         this.capacity = capacity;
@@ -51,7 +52,11 @@ public class PCQueue {
             System.out.println("Queue " + id + "dequeuing product " + product.getId()
                     + "queue.size " + size());
             q.remove(0);
-            updater.update("queue", this.id, "dequeue", product, size());
+            if(isLastQueue){
+                updater.update("queue", this.id, "throw", product, size());
+            }else{
+                updater.update("queue", this.id, "dequeue", product, size());
+            }
             not_full.signal();
             return product;
         } catch (InterruptedException e) {
@@ -125,5 +130,13 @@ public class PCQueue {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isLastQueue() {
+        return isLastQueue;
+    }
+
+    public void setLastQueue(boolean lastQueue) {
+        isLastQueue = lastQueue;
     }
 }

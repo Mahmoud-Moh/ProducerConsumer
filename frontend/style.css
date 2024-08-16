@@ -4,7 +4,7 @@ body {
 }
 canvas {
   width: 100%;
-  height: 700px;
+  height: 85vh;
   border: 3px solid black;
   font-family: "Press Start 2P", system-ui;
   font-weight: 400;
@@ -35,8 +35,7 @@ button:hover {
 button:active {
   box-shadow: 2px 2px 10px #000000;
   cursor: pointer;
-  background-color: #ffef96;
-  transform: translateY(2px) translateX(3px);
+  transform: translateY(3px);
 }
 
 #simulation-button {

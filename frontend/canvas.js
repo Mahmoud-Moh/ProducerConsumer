@@ -9,7 +9,8 @@ const simulationButton = document.getElementById("simulation-button");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d");
-const canvas_height = 700;
+const canvas_height = (innerHeight * 85) / 100;
+console.log(canvas_height);
 const product_radius = 10;
 const product_col_eps = 5;
 let machineColor = "#40E0D0";
@@ -24,6 +25,7 @@ const lines = [];
 const texts = [];
 const products = [];
 const animations = [];
+const product_speed = 5;
 let isDrawingMachine = false;
 let isDrawingQueue = false;
 let isSimulation = false;
@@ -35,17 +37,20 @@ let productId = 0;
 let m2q = {},
   q2m = {};
 
+const inputterQ = [];
+const outputterQ = [];
+
 const inputter = {
   color: "#f18973",
-  x: innerWidth - 200,
+  x: innerWidth - innerWidth * 0.05,
   y: innerHeight / 2,
-  size: 50,
+  size: innerWidth * 0.03,
 };
 const outputter = {
   color: "#f18973",
-  x: 200,
+  x: innerWidth * 0.05,
   y: innerHeight / 2,
-  size: 50,
+  size: innerWidth * 0.03,
 };
 
 ctx.font = '37px "VT323", monospace, normal';
@@ -163,9 +168,10 @@ function drawTexts() {
 }
 
 function drawProducts() {
-  for (let product of products) {
-    if (!product.stop) {
-      ctx.fillStyle = "red";
+  for (let product_entity of products) {
+    let product = product_entity["moves"][0];
+    if (product_entity["moves"].length) {
+      //ctx.fillStyle = "red";
       ctx.beginPath();
       ctx.arc(
         Math.ceil(product.x),
@@ -174,13 +180,22 @@ function drawProducts() {
         0,
         2 * Math.PI
       );
-      ctx.fillStyle = product.color;
+      ctx.fillStyle = product_entity.color;
       ctx.fill();
-      product.x = product.x + product.xinc * 10;
-      product.y = product.y + product.yinc * 10;
+      product.x = product.x + product.xinc * product_speed;
+      product.y = product.y + product.yinc * product_speed;
       product.step++;
-      if (Math.abs(product.step - product.steps) < product_col_eps)
-        product.stop = true;
+      if (Math.abs(product.step - product.steps) < product_col_eps) {
+        let found = findElement(product.x, product.y);
+        if (found.type === "machine") {
+          machines[found.idx].color = product_entity.color;
+        } else if (found.type === "queue") {
+          queues[found.idx].content = queues[found.idx].laterContent;
+        }
+        /*if (product_entity["moves"].length > 1)*/
+        product_entity["moves"].shift();
+        /*else product.shift();*/
+      }
     }
   }
 }
@@ -220,6 +235,7 @@ function drawQueue(x, y) {
     y: y - size / 2,
     size,
     content: 0,
+    laterContent: 0,
     color: queueColor,
   });
   /*texts.push({
@@ -330,13 +346,33 @@ function findElement(x, y) {
         y <= square.y + square.size
     );
   }
+  let foundIndex = -1;
+  if (!isQueue) {
+    foundIndex = machines.findIndex(
+      (square) =>
+        x >= square.x &&
+        x <= square.x + square.size &&
+        y >= square.y &&
+        y <= square.y + square.size
+    );
+  } else {
+    foundIndex = queues.findIndex(
+      (square) =>
+        x >= square.x &&
+        x <= square.x + square.size * 2 &&
+        y >= square.y &&
+        y <= square.y + square.size
+    );
+  }
   return {
     selectedElement: selectedElement,
     type: isQueue ? "queue" : "machine",
+    idx: foundIndex,
   };
 }
 
-function drawProduct(xs, ys, xe, ye, color) {
+function drawProduct(xs, ys, xe, ye, color, product_id) {
+  console.log("product_id " + product_id);
   /*let xs = line.xs;
   let ys = line.ys;
   let xe = line.xe;
@@ -348,24 +384,39 @@ function drawProduct(xs, ys, xe, ye, color) {
   xinc = dx / steps;
   yinc = dy / steps;
 
-  products.push({
-    color: color,
-    id: productId,
-    x: Math.floor(xs),
-    y: Math.floor(ys),
-    steps: steps / 10,
-    xinc: xinc,
-    yinc: yinc,
-    stepsDx: stepsDx,
-    stop: false,
-    step: 0,
-  });
-
-  productId++;
+  if (!products[product_id]) {
+    products[product_id] = {
+      color: color,
+      id: product_id,
+      moves: [
+        {
+          x: Math.floor(xs),
+          y: Math.floor(ys),
+          steps: steps / product_speed,
+          xinc: xinc,
+          yinc: yinc,
+          stepsDx: stepsDx,
+          stop: false,
+          step: 0,
+        },
+      ],
+    };
+  } else {
+    products[product_id]["moves"].push({
+      x: Math.floor(xs),
+      y: Math.floor(ys),
+      steps: steps / product_speed,
+      xinc: xinc,
+      yinc: yinc,
+      stepsDx: stepsDx,
+      stop: false,
+      step: 0,
+    });
+  }
 }
 
 function formProducts() {
-  //console.log("form points");
+  ////console.log("form points");
   for (let line of lines) {
     drawProduct(line);
   }
@@ -398,14 +449,19 @@ function createSimulation() {
         m2q[selectedElement1.id] = [];
         m2q[selectedElement1.id].push(selectedElement2.id);
       }
+    } else if (type1 === "inputter" && type2 === "queue") {
+      inputterQ.push(foundElement2.idx);
+    } else if (type1 === "queue" && type2 === "outputter") {
+      outputterQ.push(foundElement1.idx);
     }
   }
 }
 
-function addAnimation(type1, id1, type2, id2, color) {
-  console.log("type1: " + type1 + " id1: " + id1);
-  console.log("type2: " + type2 + " id2: " + id2);
-  //console.log("Adding the Animation.....");
+function addAnimation(type1, id1, type2, id2, color, product_id) {
+  console.log("Add Animation");
+  //console.log("type1: " + type1 + " id1: " + id1);
+  //console.log("type2: " + type2 + " id2: " + id2);
+  ////console.log("Adding the Animation.....");
   let xs = 0,
     ys = 0,
     xe = 0,
@@ -436,8 +492,8 @@ function addAnimation(type1, id1, type2, id2, color) {
     xe = machines[id2].x + machines[id2].size / 2;
     ye = machines[id2].y + machines[id2].size / 2;
   }
-  console.log("animation push##");
-  drawProduct(xs, ys, xe, ye, color);
+  //console.log("animation push##");
+  drawProduct(xs, ys, xe, ye, color, product_id);
   /*animations.push({
     val: "start",
     xs: xs,
@@ -445,7 +501,7 @@ function addAnimation(type1, id1, type2, id2, color) {
     xe: xe,
     ye: ye,
   });*/
-  console.log("animation push@@");
+  //console.log("animation push@@");
   /*animations.push({
     val: "end",
     x: xe,
@@ -457,7 +513,7 @@ function addAnimation(type1, id1, type2, id2, color) {
 canvas.addEventListener("click", (event) => {
   var x = event.clientX;
   var y = event.clientY;
-  //console.log(x + " " + y);
+  ////console.log(x + " " + y);
   y = (y * innerHeight) / canvas_height;
 
   if (isDrawingMachine) {
@@ -470,7 +526,7 @@ canvas.addEventListener("click", (event) => {
     let selectedElement = foundElement.selectedElement;
     let type = foundElement.type;
     if (selectedElement) {
-      //console.log("selected element true");
+      ////console.log("selected element true");
       if (type === "queue") drawQueueSelectionBox(selectedElement);
       else if (type === "machine") drawMachineSelectionBox(selectedElement);
       else drawCircleSelectionBox(selectedElement);
@@ -489,7 +545,7 @@ machineButton.addEventListener("click", () => {
   isDrawingMachine = true;
 });
 queueButton.addEventListener("click", () => {
-  //console.log("queue butto");
+  ////console.log("queue butto");
   isDrawingQueue = true;
 });
 lineButton.addEventListener("click", () => {
@@ -501,7 +557,7 @@ lineButton.addEventListener("click", () => {
   currentColor = event.target.value;
   machineColor = currentColor;
   queueColor = currentColor;
-  //console.log(currentColor);
+  ////console.log(currentColor);
 });*/
 
 //=======================================================
@@ -520,7 +576,7 @@ function drawInput() {
   ctx.arc(inputter.x, inputter.y, inputter.size, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fillStyle = "black";
-  ctx.fillText("Input", inputter.x, inputter.y);
+  ctx.fillText("I/P", inputter.x, inputter.y);
 }
 
 function drawOutput() {
@@ -534,7 +590,7 @@ function drawOutput() {
   ctx.arc(outputter.x, outputter.y, outputter.size, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fillStyle = "black";
-  ctx.fillText("Output", outputter.x, outputter.y);
+  ctx.fillText("O/P", outputter.x, outputter.y);
 }
 
 const curr_update = {},

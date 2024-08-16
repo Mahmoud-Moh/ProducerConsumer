@@ -10,6 +10,8 @@ public class Diagram {
     private int no_queues;
     private HashMap<String, List<Integer>> m2q;
     private HashMap<String, List<Integer>> q2m;
+    private List<Integer> inputterQ;
+    private List<Integer> outputterQ;
 
     public Diagram() {
     }
@@ -44,5 +46,21 @@ public class Diagram {
 
     public void setQ2m(HashMap<String, List<Integer>> q2m) {
         this.q2m = q2m;
+    }
+
+    public List<Integer> getInputterQ() {
+        return inputterQ;
+    }
+
+    public List<Integer> getOutputterQ() {
+        return outputterQ;
+    }
+
+    public void setInputterQ(List<Integer> inputterQ) {
+        this.inputterQ = inputterQ;
+    }
+
+    public void setOutputterQ(List<Integer> outputterQ) {
+        this.outputterQ = outputterQ;
     }
 }

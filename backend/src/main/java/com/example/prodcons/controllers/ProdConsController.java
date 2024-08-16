@@ -25,11 +25,12 @@ public class ProdConsController {
         Diagram diagram1 = objectMapper.readValue(diagram, Diagram.class);
 
         System.out.println("------------------");
-        for(int i=0; i<diagram1.getM2q().size(); i++)
+        System.out.println(diagram);
+        /*for(int i=0; i<diagram1.getM2q().size(); i++)
             System.out.print(diagram1.getM2q().get(i) + " ");
         System.out.println(" ");
         for(int i=0; i<diagram1.getQ2m().size(); i++)
-            System.out.print(diagram1.getQ2m().get(i) + " ");
+            System.out.print(diagram1.getQ2m().get(i) + " ");*/
         System.out.println("------------------");
 
         Simulation simulation = new Simulation(diagram1, simpMessagingTemplate);

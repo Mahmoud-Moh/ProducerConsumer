@@ -41,6 +41,8 @@ function sendSimulation() {
       no_queues: queues.length,
       m2q: m2q,
       q2m: q2m,
+      inputterQ: inputterQ,
+      outputterQ: outputterQ,
     }),
   });
 }

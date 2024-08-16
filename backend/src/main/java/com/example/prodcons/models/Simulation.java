@@ -39,13 +39,18 @@ public class Simulation {
             queueWrappers.get(i).queue.setUpdater(updater);
         }
         for(int i=0; i<diagram.getM2q().size(); i++){
+            System.out.println("i is " + i);
             machines.get(i).setOutQueueW(queueWrappers.get(diagram.getM2q().get(String.valueOf(i)).get(0)));
         }
         for(int i=0; i<diagram.getQ2m().size(); i++){
+            System.out.println("i is " + i);
             for(int j=0; j<diagram.getQ2m().get(String.valueOf(i)).size(); j++)
                 queueWrappers.get(i).addMachine(machines.get(diagram.getQ2m().get(String.valueOf(i)).get(j)));
         }
-        queueWrappers.get(queueWrappers.size()-1).setLastQueue(true);
+        for(int idx : diagram.getOutputterQ()){
+            queueWrappers.get(idx).queue.setLastQueue(true);
+        }
+        //queueWrappers.get(queueWrappers.size()-1).setLastQueue(true);
     }
 
     public Simulation(Diagram diagram, SimpMessagingTemplate template) {
@@ -73,7 +78,9 @@ public class Simulation {
             t.start();
         }
         Inputter inputter = new Inputter();
-        inputter.setInitialQueue(queueWrappers.get(0));
+        for(int idx : diagram.getInputterQ()){
+            inputter.addInitialQueue(queueWrappers.get(idx));
+        }
         Thread t = new Thread(inputter);
         t.start();
     }

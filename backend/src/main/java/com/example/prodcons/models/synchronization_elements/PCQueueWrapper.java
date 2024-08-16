@@ -9,14 +9,11 @@ public class PCQueueWrapper implements Runnable{
     public PCQueue queue;
     private ArrayList<PCMachine> machineList = new ArrayList<>();
 
-    private boolean IsLastQueue = false;
 
     public PCQueueWrapper(PCQueue queue) {
         this.queue = queue;
     }
-    public void setLastQueue(boolean lastQueue) {
-        IsLastQueue = lastQueue;
-    }
+
 
     public void addMachine(PCMachine machine){
         machineList.add(machine);
@@ -25,9 +22,10 @@ public class PCQueueWrapper implements Runnable{
     @Override
     public void run() {
         while(true) {
-            if(IsLastQueue){
-                queue.dequeue();
-            }
+            /*if(queue.isLastQueue()){
+                queue.getUpdater().update("queue", queue.getId(), "throw", queue, size());
+
+            }*/
             //ArrayList<PCMachine> readyMachines = new ArrayList<>();
             /*for(PCMachine machine : machineList){
                 System.out.println("--> machine" + machine.id);
@@ -45,13 +43,16 @@ public class PCQueueWrapper implements Runnable{
                 //readyMachines.get(i).serve(product);
                 readyMachines.get(i).setProductToServe(product);
             }*/
-
-            for(PCMachine machine : machineList){
-                if(machine.state == State.IDLE && queue.size() > 0){
-                    Product product = queue.dequeue();
-                    System.out.println("Product " + product.getId() + "served by machine " + machine.id);
-                    boolean returnBool = machine.setProductToServe(product);
-                    System.out.println(returnBool);
+            if(queue.isLastQueue()){
+                queue.dequeue();
+            }else {
+                for (PCMachine machine : machineList) {
+                    if (machine.state == State.IDLE && queue.size() > 0) {
+                        Product product = queue.dequeue();
+                        System.out.println("Product " + product.getId() + "served by machine " + machine.id);
+                        boolean returnBool = machine.setProductToServe(product);
+                        System.out.println(returnBool);
+                    }
                 }
             }
         }

@@ -2,9 +2,12 @@ package com.example.prodcons.models.synchronization_elements;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Inputter implements Runnable{
 
-    private PCQueueWrapper InitialQueue;
+    private List<PCQueueWrapper> InitialQueues;
     String[] colors = {
             "#FF0000", // Red
             "#00FF00", // Lime
@@ -20,9 +23,7 @@ public class Inputter implements Runnable{
     private SimpMessagingTemplate messagingTemplate;
 
     public Inputter() {
-    }
-    public void setInitialQueue(PCQueueWrapper initialQueue) {
-        InitialQueue = initialQueue;
+        this.InitialQueues = new ArrayList<>();
     }
 
     @Override
@@ -34,9 +35,17 @@ public class Inputter implements Runnable{
             Product product = new Product(color, id);
             product.setLastPlace("i");
             System.out.println("Inputter push Product" + id);
-            InitialQueue.queue.enqueue(product);
+            int minSize = Integer.MAX_VALUE;
+            int minSize_idx = 0;
+            for(int i=0; i < InitialQueues.size(); i++){
+                if(InitialQueues.get(i).queue.size() < minSize){
+                    minSize = InitialQueues.get(i).queue.size();
+                    minSize_idx = i;
+                }
+            }
+            InitialQueues.get(minSize_idx).queue.enqueue(product);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -53,6 +62,18 @@ public class Inputter implements Runnable{
     }
 
     public String getColor(){
-        return colors[(colorCounter++)%colors.length];
+        return colors[(++colorCounter)%colors.length];
+    }
+
+    public List<PCQueueWrapper> getInitialQueues() {
+        return InitialQueues;
+    }
+
+    public void setInitialQueues(List<PCQueueWrapper> initialQueues) {
+        InitialQueues = initialQueues;
+    }
+
+    public void addInitialQueue(PCQueueWrapper initialQueue){
+        InitialQueues.add(initialQueue);
     }
 }
