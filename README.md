@@ -1,4 +1,3 @@
-# ProducerConsumer
 # Producer-Consumer Simulation App
 
 Welcome to the **Producer-Consumer Simulation App**! This cutting-edge application leverages Spring Boot, WebSockets, JavaScript, and Canvas to simulate and visualize complex producer-consumer systems in real-time. Whether you're a developer, researcher, or enthusiast, this project provides an interactive and insightful look into multithreading and real-time data processing.
