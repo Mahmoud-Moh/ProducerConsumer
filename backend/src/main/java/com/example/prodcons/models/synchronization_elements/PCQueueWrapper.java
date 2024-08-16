@@ -22,27 +22,6 @@ public class PCQueueWrapper implements Runnable{
     @Override
     public void run() {
         while(true) {
-            /*if(queue.isLastQueue()){
-                queue.getUpdater().update("queue", queue.getId(), "throw", queue, size());
-
-            }*/
-            //ArrayList<PCMachine> readyMachines = new ArrayList<>();
-            /*for(PCMachine machine : machineList){
-                System.out.println("--> machine" + machine.id);
-                if(machine.state == State.IDLE) {
-                    System.out.println("$$ machine" + machine.id);
-                    readyMachines.add(machine);
-                }
-            }*/
-
-            /*int len = min(readyMachines.size(), queue.size());
-            System.out.println("Queue" + queue.getId() + "readyMachines" + len);
-            for(int i = 0; i < len; i++) {
-                Product product = queue.dequeue();
-                System.out.println("Machine " + readyMachines.get(i).id + "chosen to serve");
-                //readyMachines.get(i).serve(product);
-                readyMachines.get(i).setProductToServe(product);
-            }*/
             if(queue.isLastQueue()){
                 queue.dequeue();
             }else {

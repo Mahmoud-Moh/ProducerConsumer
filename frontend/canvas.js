@@ -10,7 +10,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext("2d");
 const canvas_height = (innerHeight * 85) / 100;
-console.log(canvas_height);
+
 const product_radius = 10;
 const product_col_eps = 5;
 let machineColor = "#40E0D0";
@@ -372,11 +372,7 @@ function findElement(x, y) {
 }
 
 function drawProduct(xs, ys, xe, ye, color, product_id) {
-  console.log("product_id " + product_id);
-  /*let xs = line.xs;
-  let ys = line.ys;
-  let xe = line.xe;
-  let ye = line.ye;*/
+
   let dx = xe - xs;
   let dy = ye - ys;
   let steps = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
@@ -416,7 +412,7 @@ function drawProduct(xs, ys, xe, ye, color, product_id) {
 }
 
 function formProducts() {
-  ////console.log("form points");
+
   for (let line of lines) {
     drawProduct(line);
   }
@@ -458,10 +454,7 @@ function createSimulation() {
 }
 
 function addAnimation(type1, id1, type2, id2, color, product_id) {
-  console.log("Add Animation");
-  //console.log("type1: " + type1 + " id1: " + id1);
-  //console.log("type2: " + type2 + " id2: " + id2);
-  ////console.log("Adding the Animation.....");
+
   let xs = 0,
     ys = 0,
     xe = 0,
@@ -492,28 +485,16 @@ function addAnimation(type1, id1, type2, id2, color, product_id) {
     xe = machines[id2].x + machines[id2].size / 2;
     ye = machines[id2].y + machines[id2].size / 2;
   }
-  //console.log("animation push##");
+
   drawProduct(xs, ys, xe, ye, color, product_id);
-  /*animations.push({
-    val: "start",
-    xs: xs,
-    ys: ys,
-    xe: xe,
-    ye: ye,
-  });*/
-  //console.log("animation push@@");
-  /*animations.push({
-    val: "end",
-    x: xe,
-    y: ye,
-  });*/
+  
 }
 //===================================================================
 // Add event listener to draw squares
 canvas.addEventListener("click", (event) => {
   var x = event.clientX;
   var y = event.clientY;
-  ////console.log(x + " " + y);
+
   y = (y * innerHeight) / canvas_height;
 
   if (isDrawingMachine) {
@@ -526,7 +507,7 @@ canvas.addEventListener("click", (event) => {
     let selectedElement = foundElement.selectedElement;
     let type = foundElement.type;
     if (selectedElement) {
-      ////console.log("selected element true");
+
       if (type === "queue") drawQueueSelectionBox(selectedElement);
       else if (type === "machine") drawMachineSelectionBox(selectedElement);
       else drawCircleSelectionBox(selectedElement);
@@ -545,20 +526,12 @@ machineButton.addEventListener("click", () => {
   isDrawingMachine = true;
 });
 queueButton.addEventListener("click", () => {
-  ////console.log("queue butto");
+
   isDrawingQueue = true;
 });
 lineButton.addEventListener("click", () => {
   drawLine();
 });
-
-// Update current color from color picker
-/*colorPicker.addEventListener("input", (event) => {
-  currentColor = event.target.value;
-  machineColor = currentColor;
-  queueColor = currentColor;
-  ////console.log(currentColor);
-});*/
 
 //=======================================================
 //=============Draw Input and Output=====================

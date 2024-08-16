@@ -22,13 +22,6 @@ public class Simulation {
 
 
     private void constructSimulation(){
-        /*System.out.println("-----########-------");
-        for(int i=0; i<diagram.getM2q().size(); i++)
-            System.out.print(diagram.getM2q().get(i) + " ");
-        System.out.println(" ");
-        for(int i=0; i<diagram.getQ2m().size(); i++)
-            System.out.print(diagram.getQ2m().get(i) + " ");
-        System.out.println("-----########------");*/
 
         for(int i=0; i<diagram.getNo_machines(); i++){
             machines.add(new PCMachine(String.valueOf(i)));
@@ -50,19 +43,11 @@ public class Simulation {
         for(int idx : diagram.getOutputterQ()){
             queueWrappers.get(idx).queue.setLastQueue(true);
         }
-        //queueWrappers.get(queueWrappers.size()-1).setLastQueue(true);
     }
 
     public Simulation(Diagram diagram, SimpMessagingTemplate template) {
         this.diagram = diagram;
         this.template = template;
-        /*System.out.println("---@@@@@@---------");
-        for(int i=0; i<diagram.getM2q().size(); i++)
-            System.out.print(diagram.getM2q().get(i) + " ");
-        System.out.println(" ");
-        for(int i=0; i<diagram.getQ2m().size(); i++)
-            System.out.print(diagram.getQ2m().get(i) + " ");
-        System.out.println("---@@@@@---------");*/
         prepareUpdater();
         constructSimulation();
     }

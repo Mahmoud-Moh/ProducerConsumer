@@ -62,9 +62,6 @@ public class PCMachine implements Runnable{
     public void run(){
         while(true){
             if(state == State.READY){
-                if(productToServe == null){
-                    System.out.println("What the hell why is it null and ready");
-                }
                 System.out.println(productToServe.getId());
                 try {
                     serve(productToServe);
@@ -89,11 +86,6 @@ public class PCMachine implements Runnable{
         setProductLock.lock();
         this.productToServe = p;
         state = State.READY;
-        if(this.productToServe == null){
-            System.out.println("#### I SAID SET IT NOT NULL###");
-        }else{
-            System.out.println("#### " + productToServe.getId() + "###");
-        }
         setProductLock.unlock();
         return true;
     }
