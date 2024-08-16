@@ -31,7 +31,7 @@ Welcome to the **Producer-Consumer Simulation App**! This application leverages 
 1. **Clone the Repository:**
 
     ```bash
-    git clone [https://github.com/Mahmoud-Moh/ProducerConsumer.git]
+    git clone https://github.com/Mahmoud-Moh/ProducerConsumer.git
     cd ProducerConsumer-main
     ```
 
